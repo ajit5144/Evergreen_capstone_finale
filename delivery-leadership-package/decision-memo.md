@@ -1,7 +1,7 @@
 # Decision Memo: Lead with Life in Content, Not in Code
 
 **Date:** Tue afternoon (after Inject #1)
-**Author:** Morgan Reyes
+**Author:** Ajit Ranjan Sahu
 **Decision area:** Launch-week scope tradeoff
 
 ## Context

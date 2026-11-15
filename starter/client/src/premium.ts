@@ -3,19 +3,20 @@
 // app shipped with. CONFIG: Day 2 aligns them with the API's standardized
 // rates; the values are the only thing that changes.)
 import type { CoverageType } from "./types";
+import baseRates from "./baseRates.json" with { type: "json" };
 
-const BASE_RATES: Record<CoverageType, number> = {
-  auto: 85,
-  home: 130,
-  life: 65,
-};
+//const BASE_RATES: Record<CoverageType, number> = {
+//  auto: 85,
+//  home: 130,
+//  life: 65,
+//};
 
 export function calculatePremium(
   type: CoverageType,
   age: number,
   coverageAmount: number
 ): number {
-  const base = BASE_RATES[type] ?? 100;
+  const base = baseRates[type] ?? 100;
   const ageFactor = age < 25 ? 1.4 : age > 60 ? 1.25 : 1.0;
   const coverageFactor = coverageAmount / 10000;
   return base * ageFactor * coverageFactor;

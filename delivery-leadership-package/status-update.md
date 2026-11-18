@@ -1,28 +1,35 @@
-# Stakeholder Status Update: Evergreen Quote, Tue EOD
+# Stakeholder Status Update: Evergreen Quote, Thu EOD
 
-**To:** Priya Ramanathan (Project Sponsor)
-**From:** Morgan Reyes (Delivery Lead)
-**Date:** Tue 17:00
+**To:** Project Sponsor
+**From:** Ajit Ranjan Sahu (Delivery Lead)
+**Date:** Thu 17:00
 
 ## What shipped today
 
-- The client is wired to the API: the five provided pieces copied in, exactly one type error at the seam (the compiler named the file and line; the kit's one-line fix, `id: doc.id` → `id: doc._id`, made it clean), and then the program's first persistent quote: saved, reloaded, still there.
-- Decommissioning the stub feed: `sampleQuotes.ts` and `quotes.json` retired from the repo. The database is the only source of recent quotes now.
-- Your rate instruction applied. The drift was visible on screen (estimate $425.00, saved row $450.00/mo for the same inputs); after aligning the client to 90/135/70, both read $450.00. One CONFIG edit, spot-checked.
-- The launch title in `.env`, your banner line and both quote links on the landing page, and marketing's hero rewrite applied (content only, 10 minutes).
-- GraphQL mounted at the two markers; one mutation verified in the explorer (life/30/100000 → 700) and the saved document confirmed in `mongosh`.
+- The production client build passed and was previewed against the real API. Recent quotes loaded successfully, and a saved quote remained available after reload.
+- The API’s seven tests passed. The launch PR was reviewed and squash-merged into `main`, the delivery branch was deleted, and both CI jobs—**Test the API** and **Type-check and build the client**—were green on the merged launch commit.
+- The application was reverified on `main`: live estimation, database-backed recent quotes, and save-and-reload behavior worked. The auto/35/50000 check showed **$450.00** in both the estimate and newly saved premium.
+- The API image `evergreen-quote-api:2.0` was demonstrated on the local `evergreen` kind cluster with three API pods and one MongoDB pod. Port-forwarding the API Service to port `3000` allowed the client to connect without changes.
+- The launch title, approved banner, life-first landing content, and both quote links were configured. The static feeds were retired, and the provided GraphQL mutation was verified.
+- The required `delivery-leadership-package/` artifacts were consolidated and committed to `main`.
+- The five-slide showcase was prepared and rehearsed for the five-minute slot, with a local demo plan and screenshot fallback.
 
 ## What slipped (and why)
 
-- Nothing from the plan. Marketing's quote-form default ask is **acknowledged, not done**: it is application code in the engineering team's file, two days before launch. I routed it to them with my recommendation that it leads their next window; renters stays deferred (see `decision-memo.md`).
+- No required launch work was deferred.
+- The quote form’s life-default change and renters coverage remain outside this launch’s MVP. They are routed for post-launch planning because they require engineering ownership and coordinated verification.
+- The shared demo incident remains tracked with the Platform Services Team. Its recovery is separate from Friday’s local demo and does not gate our merge.
 
 ## What's next (tomorrow)
 
-- Build `evergreen-quote-api:2.0`; run the stack from the container, then on the kind cluster, database first.
-- Enable the two-job CI and make the Friday go/no-go from its signal.
-- The required Copilot seed step, with a written critique.
+- Complete the final readiness check: local pods, port-forward, client connectivity, and a saved demonstration quote.
+- Participate in the lessons-learned review and final program debrief.
+- Deliver the five-minute manager showcase, covering the goal, shipped product, decisions, risks, and program journey.
+- Use screenshot fallback if the live demonstration encounters a problem.
+- After the showcase, stop the port-forward, delete the local `evergreen` cluster, and confirm the final repository contents are pushed to `main`.
 
 ## What I need from you
 
-- **Confirm by 11:00 Wed:** the form default stays out of this launch (routed to engineering), and renters stays deferred.
-- **Acknowledge the written demo plan I sent at 15:10:** Friday's demo runs on my VM (kind cluster plus port-forward to 3000); nothing depends on a shared cloud window.
+- **Confirm before Friday’s showcase:** presentation order, room logistics, and the local demo plan.
+- **Acknowledge the launch scope:** life-first content is included; the form-default change and renters remain deferred for post-launch assessment.
+- **Acknowledge the GO decision for the local demo:** Friday uses the `evergreen` kind cluster on the VM, `kubectl port-forward svc/evergreen-quote-api 3000:80`, and the client at `http://localhost:5173`. No shared environment or cloud account is required.

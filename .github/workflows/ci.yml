@@ -1,0 +1,83 @@
+# ci.yml - the Evergreen Quote launch pipeline (provided).
+# Capstone learners: enable this by copying it to .github/workflows/ci.yml in
+# your repository. Do not modify it.
+# Two jobs, because the launch has two halves: the API proves its behavior
+# with tests against a throwaway database, and the client proves its
+# contracts type-check and its production build succeeds.
+name: CI
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+jobs:
+  api-tests:
+    name: Test the API
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: starter/api
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v5
+
+      - name: Inspect Project Structure
+        working-directory: ${{ github.workspace }}
+        shell: bash
+        run: |
+          echo "=== Project tree (up to 4 levels) ==="
+          if command -v tree >/dev/null 2>&1; then
+            tree -a -L 4 -I 'node_modules|.git'
+          else
+            find . -maxdepth 4 \
+              $$ -type d $$ -name node_modules -o -name .git $$ -prune $$ \
+              -o -print | sort
+          fi
+          
+          echo "=== Committed package-lock.json paths ==="
+          git ls-files '*package-lock.json'
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: starter/api/package-lock.json
+
+      - name: Install dependencies from the lock file
+        run: npm ci
+
+      - name: Run the API tests (the safety net)
+        run: npm test
+
+  client-build:
+    name: Type-check and build the client
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: starter/client
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v5
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: starter/client/package-lock.json
+
+      - name: Install dependencies from the lock file
+        run: npm ci
+
+      - name: Type-check (the contracts must hold)
+        run: npm run type-check
+
+      - name: Build for production
+        run: npm run build

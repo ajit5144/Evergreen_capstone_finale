@@ -2,35 +2,52 @@
 
 ## Slide 1: Delivery goal & did we hit it?
 
-- **Goal:** "The wired Evergreen Quote launch (client reading and saving through the API at the standardized rates, containerized, demonstrated on the local cluster) on `main` via a reviewed PR with both CI jobs green."
-- **Hit?** ☒ Yes. Merged Thursday, both jobs green on `main`, tagged `launch`; one ask routed (the form default), one deferral held (renters).
+- **Goal:** “Deliver the wired Evergreen Quote MVP on `main` through a reviewed PR with both CI jobs green, using standardized rates and a containerized API demonstrated on the local cluster.”
+- **Hit?** ☒ Yes. The launch is merged into `main`, both CI jobs are green, and the application has been reverified after merge.
+- **Scope protected:** life-first landing content included; the form-default change routed for post-launch planning; renters kept deferred.
 
 ## Slide 2: What shipped
 
-- Demo, live from the cluster: the recent quotes come from the database; I save a quote, reload, and it is still there; the estimate and the saved premium both read $450.00.
-- Merged PR #14. The diff is the program: HTML, TypeScript, JavaScript, a Dockerfile, YAML, a pipeline. I self-reviewed it as the program's table of contents before asking anyone else to look.
-- The green two-job run on the merge commit (**Test the API** · **Type-check and build the client**); link in slide notes.
+- **Live demo from the cluster:** recent quotes load from MongoDB; an auto quote for age 35 and coverage 50000 shows a **$450.00** estimate; saving and reloading preserves the quote with the same premium.
+- **Containerized delivery:** `evergreen-quote-api:2.0` runs as three API replicas behind one Service, alongside MongoDB on the local `evergreen` kind cluster.
+- **One consistent connection:** `kubectl port-forward svc/evergreen-quote-api 3000:80` connects the existing client proxy to the cluster without changing the client.
+- **Reviewed launch:** the PR was self-reviewed and squash-merged, and the delivery branch was deleted. The diff spans HTML, TypeScript, JavaScript, GraphQL, Docker, Kubernetes manifests, and CI.
+- **Release evidence:** both CI jobs—**Test the API** and **Type-check and build the client**—are green on the merged launch commit.
+- **Production verification:** the built client was previewed against the real API, and the static quote feeds were retired.
 
 ## Slide 3: Two key decisions
 
-- **Lead with life in content, not in code.** Marketing's hero rewrite: approved, done in 10 minutes. The form default: declined and routed; application code belongs to the engineering team two days before launch. Why it mattered: the launch shipped calm, and marketing still got their headline. (See decision-memo.md.)
-- **The GO came from my stack's evidence, not the incident's noise.** Wednesday's outage was the shared demo cluster; this launch never touched it. Naming *which environment is broken* is what let me say GO without bravado. Why it mattered: the managers in this room saw "Could not load recent quotes" on Wednesday, and the launch was never at risk.
+- **Continue as MVP; change application behavior after launch.** The life-first hero and banner support Marketing’s message without expanding application scope. The form-default change belongs to the Front-End Team, and renters requires coordinated client and API changes. Why it mattered: stakeholder priorities were acknowledged while required verification and rehearsal time were protected.
+- **GO based on local evidence, not the shared incident alone.** The shared demo cluster was impaired, but Friday’s demo uses the separately verified local stack. Why it mattered: we could continue responsibly while routing the real incident to its owner and keeping the reporting manager informed.
 
 ## Slide 4: Risks & injects
 
-- **Top risk tracked:** premium math lives in two places. Tuesday it was on screen: estimate $425.00, saved row $450.00/mo for the same inputs. The sponsor's alignment instruction resolved it as one CONFIG edit; the server is the source of truth.
-- **Inject #1 (Tue):** marketing's life-coverage ask, a renters callback, and the platform team pulling the shared cloud window. Sorted content from code, routed the code, kept renters deferred, and confirmed the local demo plan in writing.
-- **Inject #2 (Wed):** a manager's dry run failed on the shared demo cluster. I read the pod log and named it in plain English: the API pods restart because they cannot find the database; the database is healthy; the change was a renamed environment variable, `MONGO_URI` where the app reads `MONGODB_URI`. Routed to the platform owner with one question, calm holding note to the manager, GO held (see go-no-go.md).
+- **Top risk tracked:** premium calculations exist in two places. The initial auto/35/50000 estimate was $425.00 while the API saved $450.00. Aligning client rates to auto 90, home 135, and life 70 resolved the immediate mismatch. Calculation duplication remains documented for post-launch evaluation.
+- **Inject #1:** split Marketing’s request into content and application changes, preserved the MVP, deferred renters, reprioritized the board, and confirmed the local demo plan in writing.
+- **Inject #2:** the shared capture showed three API pods crash-looping and database connections refused at `127.0.0.1:27017`. The deployment supplied `MONGO_URI` where the application expects `MONGODB_URI`, indicating a likely configuration mismatch for the Platform Services Team to confirm.
+- **Response:** routed the evidence and a specific recovery request to the Platform Services Team; provided a separate manager holding update; assessed local readiness independently.
+- **Thursday decision:** GO for Friday’s local showcase, supported by green CI on `main`, healthy local pods, API connectivity, rate agreement, and save-and-reload verification. Shared recovery remains separately owned and tracked.
 
 ## Slide 5: What three phases built
 
-- One journey: a static page that estimated (Phase 1), then a live, typed React app (Phase 2), then a service with a database (Phase 3), and this week the two halves wired together, in a container, on a cluster, merged with green CI. The first quote that ever survived a reload happened on Tuesday of the final week; everything before it was building toward that moment.
-- **What I take back to work on Monday:** route problems to their owner with evidence and one specific question, and name the broken environment before naming a fix.
-- **One thing I'd do differently next round:** confirm the demo environment in writing on Monday morning, not when an inject forces the issue on Tuesday.
+- **One journey:** a static landing page in Phase 1, a live typed React app in Phase 2, an Express service with MongoDB in Phase 3, and this week one wired, containerized, orchestrated product delivered through a reviewed PR.
+- **Customer outcome:** the shopper receives an instant estimate and can save a quote that remains available after reload.
+- **What I take back to work:** name the affected environment, route problems to the owning team with evidence, and ask one specific question with a response time.
+- **What I would do differently:** confirm the demo environment and fallback at kickoff, and establish explicit rate-agreement checks before integration exposes drift.
 
 ## Q&A prep: likely questions
 
-- *"It worked on your machine; why should I believe it works anywhere else?"* Because my machine is doing the least of the work: the same image ran as three replicas behind one Service on a cluster, and CI rebuilt and tested everything from the lock files on a machine I have never seen.
-- *"Why didn't you fix the crashing pods yourself on Wednesday?"* They were the platform team's pods, broken by the platform team's change. My job was the evidence, one specific question, and protecting the launch; their fix was a one-line revert.
+- *“It worked on your machine; why should we trust the delivery?”* The API runs from a repeatable container image, and CI installs from lock files, tests against a clean MongoDB service, and type-checks and builds the client on a separate runner. Local cluster and production-preview checks add deployment evidence. This increases confidence without claiming production readiness in every environment.
+- *“Why didn’t you fix the shared pods yourself?”* The Platform Services Team owns that environment. My responsibility as Delivery Manager was to provide evidence, request recovery ownership and timing, communicate impact, and verify our launch—not apply an unauthorized patch.
+- *“Why defer renters?”* It crosses the client type contract, premium tables, form, and API database validation. It needs coordinated implementation and end-to-end testing rather than a rushed client-only change.
+- *“Why keep premium calculations in two places?”* Client estimates keep the MVP responsive, while the API determines the saved premium. We verified agreement for launch and recorded centralized estimation as a post-launch evaluation.
+- *“What happens if the live demo fails?”* Screenshot fallback is immediately available. We will identify it clearly rather than present screenshots as proof that the live stack is healthy.
 
-(Rehearsed Thursday afternoon: 4 minutes 40 seconds, inside the 5-minute slot.)
+## Rehearsal & readiness
+
+- The presentation was rehearsed Thursday afternoon within the five-minute limit.
+- The local cluster remains running overnight.
+- Friday’s demo uses the client at `http://localhost:5173`, connected through the API port-forward.
+- A saved demonstration quote and screenshot fallback are prepared.
+- Final readiness checks will be repeated before Friday’s showcase.
+- The local cluster will be deleted after the showcase, and the completed product and leadership package will remain on `main`.

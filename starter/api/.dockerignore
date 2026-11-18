@@ -1,0 +1,17 @@
+node_modules
+npm-debug.log*
+.env
+.env.*
+.git
+.gitignore
+Dockerfile
+.dockerignore
+coverage
+.vscode
+*.log
+
+# Keep the app source, but ignore test and dev metadata
+.test-data
+
+# Optional local editor/cache folders
+.DS_Store

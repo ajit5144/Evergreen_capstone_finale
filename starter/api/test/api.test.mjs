@@ -104,3 +104,27 @@ test("POST /api/quote rejects an unknown coverage type with a 400", async () => 
   });
   assert.equal(res.status, 400);
 });
+
+test("POST /api/quote creates a renters quote and returns 201", async () => {
+  const res = await fetch(`${base}/api/quote`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type: "renters", age: 32, coverageAmount: 25000 }),
+  });
+  assert.equal(res.status, 201);
+  const quote = await res.json();
+  assert.ok(quote._id, "the created renters quote has an id");
+  assert.equal(quote.type, "renters");
+  assert.equal(quote.coverageAmount, 25000);
+});
+
+test("POST /api/quote computes the renters premium with the shared rate table", async () => {
+  const res = await fetch(`${base}/api/quote`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type: "renters", age: 32, coverageAmount: 25000 }),
+  });
+  assert.equal(res.status, 201);
+  const quote = await res.json();
+  assert.equal(quote.monthlyPremium, calculatePremium("renters", 32, 25000));
+});

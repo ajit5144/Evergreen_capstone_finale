@@ -16,14 +16,25 @@ function RecentQuotes() {
       {error && <p className="message">{error}</p>}
       {!loading && !error && (
         <ul className="recent-list">
-          {quotes.map((quote) => (
-            <li key={quote.id}>
-              <span className="quote-type">{quote.type}</span> -{" "}
-              <span className="quote-premium">
-                {formatCurrency(quote.monthlyPremium)}/mo
-              </span>
-            </li>
-          ))}
+          {quotes.map((quote) => {
+            const imageType = quote.type === "renters" ? "home" : quote.type;
+
+            return (
+              <li key={quote.id} className="recent-quote">
+                <img
+                  className="quote-image"
+                  src={`/${imageType}.svg`}
+                  alt={`${quote.type} coverage`}
+                />
+                <div className="quote-details">
+                  <span className="quote-type">{quote.type}</span>
+                  <span className="quote-premium">
+                    {formatCurrency(quote.monthlyPremium)}/mo
+                  </span>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
     </aside>

@@ -1,27 +1,37 @@
-# Decision Memo: Lead with Life in Content, Not in Code
+# Decision Memo: Where Premium Estimates Are Calculated (API or Client)?
 
-**Date:** Tue afternoon (after Inject #1)
-**Author:** Morgan Reyes
-**Decision area:** Launch-week scope tradeoff
+**Date:** 11/17/2026
+**Author:** Ajit Ranjan Sahu
+**Decision area:** Architecture - Redundant logic execution
 
 ## Context
 
-Marketing asked Tuesday at 14:00 for the Friday launch to lead with life coverage: rewrite the landing hero and make life the quote form's default coverage type. The same note carried a one-line renters callback ("you may remember deferring this one last week; still on the wish list") and the platform team's confirmation that there is no shared cloud window this week, with a request to confirm the demo plan in writing. Three asks, two days before launch.
+The client calculates the live premium estimate, while the API calculates the premium saved with a quote. The values have been aligned to the standardized rates. However, the calculation still exists in two places, so a future change could make the customer see two prices for the same inputs.
+
+The decision is whether to keep instant client-side estimates or request every estimate from the API. Thursday’s merge and Friday’s showcase are close, and the required capstone work is assembly—not new application development.
 
 ## Options considered
 
-1. **Take all three changes into the launch.** Pros: marketing gets everything at once. Cons: the form default is application code owned by the engineering team, and renters is not one field. It touches the client's `CoverageType` union, the premium tables in two languages, the form, and the API's Mongoose enum: two validation systems that must change together. Last week's capstone deferred it for exactly this shape.
-2. **Change the client only.** Set the form default myself and add renters to the client's union without touching the API. Pros: fast, and Friday's demo would look responsive to marketing. Cons: this is the hack I rejected. A client that offers renters while the API's schema refuses it turns the customer's commit moment into a 400 error, and the type system that caught Tuesday's seam defect becomes the thing I am quietly working around.
-3. **Content changes now, code changes routed.** Approve the hero rewrite: the landing page is pure HTML content with no behavior, and the edit took 10 minutes. Decline the form default for this launch and route it to the engineering team with a written recommendation that it leads their next window; it is small, but it is their file, two days before launch. Keep renters deferred with a named slot: first candidate for the round after launch, already sized at five files, two languages, two validation systems.
+1. **Keep client-side estimates and let the API determine the saved premium.** Pros: customers receive immediate estimates without waiting for a network request; the provided design stays intact; no additional application changes are needed for launch. Cons: rate changes must be coordinated across both systems, and duplicate calculations can drift.
+
+2. **Request every estimate from the API before launch.** Pros: calculations and rate updates are centralized, reducing the risk of inconsistent prices. Cons: estimates become dependent on network connectivity and API availability. The Front-End Team and Platform Services Team would need to implement and test changes outside the required assembly scope, putting merge and rehearsal time at risk.
+
+3. **Keep the current design for launch and route centralized estimation for post-launch evaluation.** Pros: preserves instant estimates and protects the launch schedule while giving the duplication a clear follow-up. Cons: the mismatch risk remains during launch and needs explicit verification and coordinated rate updates.
 
 ## Recommendation
 
-**Option 3.** The hero shipped Tuesday afternoon; the routing note and the written demo-plan confirmation (kind cluster plus port-forward to 3000 on my VM; nothing depends on a shared cloud window) went out the same hour.
+**Option 3.** Keep client-side estimates for this launch, with the API remaining the authority for the saved premium. The Front-End Team and Platform Services Team should verify estimate-versus-save agreement and assess centralized estimation after launch.
+
+The required auto/35/50000 check must show **$450.00** in both the estimate and newly saved row. Historical seeded premiums remain unchanged because they were quoted under older rates.
 
 ## Why
 
-Two days before a launch, the only safe change is one whose whole blast radius I can see. Content has none. The other two asks each cross a boundary (a team's application code, a schema shared by two systems), and a launch demo is the worst place to discover the far side of a boundary.
+Moving every estimate to the API is a reasonable direction to evaluate, but it is not a configuration change. It introduces network-dependent behavior and requires engineering work and testing shortly before launch.
+
+For this week, keeping the provided design is the smaller, more visible change. We accept the duplication as a documented risk, not as a permanent solution. Type-checking and API tests support release confidence, but they do not by themselves prove that the two rate tables agree; that requires an explicit comparison.
 
 ## What would change my mind
 
-If the engineering team confirmed by Wednesday 12:00 that they would land the form default themselves with both CI jobs green, I would take it into the launch. Renters stays deferred regardless; its slot is named, and "still on the wish list" is not a delivery date.
+I would reconsider if the Front-End Team and Platform Services Team could deliver centralized estimation within the launch window, demonstrate acceptable response times and clear failure handling, and provide a reviewed change with both CI jobs green without displacing required verification or rehearsal.
+
+A mismatch in a newly saved quote after rate alignment would trigger an immediate readiness review. It would require investigation and sponsor confirmation—not an unverified last-minute rewrite.

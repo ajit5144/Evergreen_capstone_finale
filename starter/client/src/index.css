@@ -152,8 +152,25 @@ body {
 }
 
 .recent-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   padding: 10px 0;
   border-bottom: 1px solid var(--border);
+}
+
+.quote-image {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+}
+
+.quote-details {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex: 1;
 }
 
 .recent-list li:last-child {

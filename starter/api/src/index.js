@@ -4,6 +4,7 @@
 import express from "express";
 import { connectDB } from "./db.js";
 import { registerQuoteRoutes } from "./routes.js";
+import { mountGraphQL } from "./graphql.js";
 // INSERT: GraphQL import (Day 2 - paste the line from the kit README here)
 
 const app = express();
@@ -19,6 +20,8 @@ app.get("/", (req, res) => {
 registerQuoteRoutes(app);
 
 // INSERT: mount GraphQL (Day 2 - paste the line from the kit README here)
+
+ mountGraphQL(app);
 
 // The two handlers below must stay AFTER the routes: Express checks them in order.
 app.use((req, res) => {

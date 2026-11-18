@@ -5,8 +5,12 @@
 
 ## CI evidence
 
-- Latest run on the merged launch commit on `main`: **Green** · link: https://github.com/ajit5144/Evergreen_capstone_finale/actions/runs/44005596776
-- Reviewed and squash-merged PR: <<PR URL>>
+- Latest run on the merged launch commit on `main`: **Green** · 
+
+- link: https://github.com/ajit5144/Evergreen_capstone_finale/actions/runs/44214399351
+
+- Reviewed and squash-merged PR: https://github.com/ajit5144/Evergreen_capstone_finale/pull/14
+
 - Workflow file: `.github/workflows/ci.yml`
 - **Test the API** installs dependencies using `npm ci` and passes the seven API tests against a throwaway `mongo:7` service container.
 - **Type-check and build the client** installs dependencies using `npm ci`, passes `npm run type-check`, and completes `npm run build`.

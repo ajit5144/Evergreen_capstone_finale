@@ -27,6 +27,22 @@ jobs:
       - name: Check out the code
         uses: actions/checkout@v5
 
+      - name: Inspect Project Structure
+        working-directory: ${{ github.workspace }}
+        shell: bash
+        run: |
+          echo "=== Project tree (up to 4 levels) ==="
+          if command -v tree >/dev/null 2>&1; then
+            tree -a -L 4 -I 'node_modules|.git'
+          else
+            find . -maxdepth 4 \
+              $$ -type d $$ -name node_modules -o -name .git $$ -prune $$ \
+              -o -print | sort
+          fi
+          
+          echo "=== Committed package-lock.json paths ==="
+          git ls-files '*package-lock.json'
+
       - name: Set up Node 22
         uses: actions/setup-node@v5
         with:
